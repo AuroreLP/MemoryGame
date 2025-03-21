@@ -60,6 +60,13 @@ function onCardClick(e){
                 selectedCards[1].classList.add("matched");
                 selectedCards[0].removeEventListener('click', onCardClick);
                 selectedCards[1].removeEventListener('click', onCardClick);
+
+                const allCardsNotMatched = document.querySelectorAll('.card:not(.matched)');
+                console.log(allCardsNotMatched.length);
+                if (allCardsNotMatched.length == 0) {
+                    // le joueur a gagné
+                    alert("Bravo, vous avez gagné!");
+                }
             }
             else{
                 // on s'est trompé
