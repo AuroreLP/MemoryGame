@@ -35,8 +35,15 @@ function duplicateArray(arraySimple){
     return arrayDouble;
 }
 
-const allCards = duplicateArray(cards);
+// créer la méthode shuffleArray pour mélanger les cartes
+function shuffleArray(arrayToshuffle){
+    const arrayShuffled = arrayToshuffle.sort(() => 0.5 - Math.random());
+    return arrayShuffled;
+}
 
+let allCards = duplicateArray(cards);
+// mélanger le tableau allCards avant de le parcourir
+allCards = shuffleArray(allCards);
 allCards.forEach(card => {
     const cardHtml = createCard(card);
     gameBoard.appendChild(cardHtml);
