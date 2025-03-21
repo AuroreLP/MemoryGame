@@ -24,6 +24,8 @@ function createCard(CardURL) {
 
     // ici on lie l'image à la carte
     card.appendChild(cardContent);
+
+    card.addEventListener('click', onCardClick);
     return card;
 }
 
@@ -39,6 +41,12 @@ function duplicateArray(arraySimple){
 function shuffleArray(arrayToshuffle){
     const arrayShuffled = arrayToshuffle.sort(() => 0.5 - Math.random());
     return arrayShuffled;
+}
+
+// créer fonction onCardClick pour retourner la carte sur le clic
+function onCardClick(e){
+    const card = e.target.parentElement;
+    card.classList.add('flip');
 }
 
 let allCards = duplicateArray(cards);
