@@ -52,19 +52,22 @@ function onCardClick(e){
 
     selectedCards.push(card);
     if(selectedCards.length == 2) {
-        if(selectedCards[0].dataset.value == selectedCards[1].dataset.value) {
-            // on a trouvé une paire
-            selectedCards[0].classList.add("matched");
-            selectedCards[1].classList.add("matched");
-            selectedCards[0].removeEventListener('click', onCardClick);
-            selectedCards[1].removeEventListener('click', onCardClick);
-        }
-        else{
-            // on s'est trompé
-            selectedCards[0].classList.remove("flip");
-            selectedCards[1].classList.remove("flip");
-        }
-        selectedCards = [];
+        setTimeout(() => {
+            // le code à exécuter après le timeout
+            if(selectedCards[0].dataset.value == selectedCards[1].dataset.value) {
+                // on a trouvé une paire
+                selectedCards[0].classList.add("matched");
+                selectedCards[1].classList.add("matched");
+                selectedCards[0].removeEventListener('click', onCardClick);
+                selectedCards[1].removeEventListener('click', onCardClick);
+            }
+            else{
+                // on s'est trompé
+                selectedCards[0].classList.remove("flip");
+                selectedCards[1].classList.remove("flip");
+            }
+            selectedCards = [];
+       }, 1000);
     }
 }
 
