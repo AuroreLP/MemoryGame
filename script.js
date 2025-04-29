@@ -1,88 +1,144 @@
-const cards = [
-    'https://picsum.photos/id/237/100/100',
-    'https://picsum.photos/id/238/100/100',
-    'https://picsum.photos/id/239/100/100',
-    'https://picsum.photos/id/240/100/100',
-    'https://picsum.photos/id/241/100/100',
-    'https://picsum.photos/id/242/100/100',
-    'https://picsum.photos/id/243/100/100',
-    'https://picsum.photos/id/244/100/100',
-];
-
-const gameBoard = document.getElementById('game-board');
-
-let selectedCards = [];
-
-function createCard(CardURL) {
-    // création de la carte
-    const card = document.createElement('div');
-    card.classList.add('card');
-    card.dataset.value = CardURL;
-
-    // ajout du contenu de la carte - renvoi vers l'url de l'image
-    const cardContent = document.createElement('img');
-    cardContent.classList.add('card-content');
-    cardContent.src = `${CardURL}`;
-
-    // ici on lie l'image à la carte
-    card.appendChild(cardContent);
-
-    card.addEventListener('click', onCardClick);
-    return card;
-}
-
-function duplicateArray(arraySimple){
-    let arrayDouble = [];
-    arrayDouble.push(...arraySimple);
-    arrayDouble.push(...arraySimple);
-
-    return arrayDouble;
-}
-
-// créer la méthode shuffleArray pour mélanger les cartes
-function shuffleArray(arrayToshuffle){
-    const arrayShuffled = arrayToshuffle.sort(() => 0.5 - Math.random());
-    return arrayShuffled;
-}
-
-// créer fonction onCardClick pour retourner la carte sur le clic
-function onCardClick(e){
-    const card = e.target.parentElement;
-    card.classList.add('flip');
-
-    selectedCards.push(card);
-    if(selectedCards.length == 2) {
-        setTimeout(() => {
-            // le code à exécuter après le timeout
-            if(selectedCards[0].dataset.value == selectedCards[1].dataset.value) {
-                // on a trouvé une paire
-                selectedCards[0].classList.add("matched");
-                selectedCards[1].classList.add("matched");
-                selectedCards[0].removeEventListener('click', onCardClick);
-                selectedCards[1].removeEventListener('click', onCardClick);
-
-                const allCardsNotMatched = document.querySelectorAll('.card:not(.matched)');
-                console.log(allCardsNotMatched.length);
-                if (allCardsNotMatched.length == 0) {
-                    // le joueur a gagné
-                    alert("Bravo, vous avez gagné!");
-                }
-            }
-            else{
-                // on s'est trompé
-                selectedCards[0].classList.remove("flip");
-                selectedCards[1].classList.remove("flip");
-            }
-            selectedCards = [];
-       }, 1000);
+class Card {
+    constructor(emoji) {
+      this.emoji = emoji;
+      this.element = document.createElement('div');
+      this.element.className = 'card';
+      this.element.setAttribute('tabindex', '0');
+      this.element.setAttribute('role', 'button');
+      this.element.setAttribute('aria-label', 'Carte de mémoire');
+      this.flipped = false;
+      this.matched = false;
+  
+      this.element.addEventListener('click', () => this.handleClick());
+      this.element.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') this.handleClick();
+      });
     }
+  
+    handleClick() {
+      if (this.flipped || this.matched) return;
+      this.flip();
+      game.handleCardFlip(this);
+    }
+  
+    flip() {
+      this.flipped = true;
+      this.element.classList.add('flipped');
+      this.element.textContent = this.emoji;
+    }
+  
+    unflip() {
+      this.flipped = false;
+      this.element.classList.remove('flipped');
+      this.element.textContent = '';
+    }
+  
+    match() {
+        this.matched = true;
+        this.element.classList.add('matched');
+        // Retire la classe après l'animation
+        setTimeout(() => {
+          this.element.classList.remove('matched');
+        }, 500);
+    }
+        
+  
+    getNode() {
+      return this.element;
+    
+  }
 }
-
-let allCards = duplicateArray(cards);
-// mélanger le tableau allCards avant de le parcourir
-allCards = shuffleArray(allCards);
-allCards.forEach(card => {
-    const cardHtml = createCard(card);
-    gameBoard.appendChild(cardHtml);
-
-})
+  
+  class MemoryGame {
+    constructor(boardId, timerId) {
+      this.board = document.getElementById(boardId);
+      this.timerDisplay = document.getElementById(timerId);
+      this.restartButton = document.getElementById('restart');
+  
+      this.emojis = ['🐶', '🐱', '🐰', '🦊', '🐼', '🐻', '🐸', '🦁'];
+      this.cards = [];
+      this.firstCard = null;
+      this.lock = false;
+      this.startTime = null;
+      this.interval = null;
+  
+      this.restartButton.addEventListener('click', () => this.start());
+      this.start();
+    }
+  
+    start() {
+      this.clearBoard();
+      this.shuffle();
+      this.render();
+      this.startTimer();
+      document.getElementById('winMessage').style.display = 'none';
+    }
+  
+    clearBoard() {
+      this.board.innerHTML = '';
+      this.cards = [];
+      this.firstCard = null;
+      clearInterval(this.interval);
+      this.timerDisplay.textContent = 'Temps : 0s';
+    }
+  
+    shuffle() {
+      const deck = [...this.emojis, ...this.emojis].sort(() => 0.5 - Math.random());
+      deck.forEach(emoji => this.cards.push(new Card(emoji)));
+    }
+  
+    render() {
+      this.cards.forEach(card => this.board.appendChild(card.getNode()));
+    }
+  
+    startTimer() {
+      this.startTime = Date.now();
+      this.interval = setInterval(() => {
+        const seconds = Math.floor((Date.now() - this.startTime) / 1000);
+        this.timerDisplay.textContent = `Temps : ${seconds}s`;
+      }, 1000);
+    }
+  
+    handleCardFlip(card) {
+        if (this.lock || card === this.firstCard) return;
+      
+        card.flip();
+      
+        if (!this.firstCard) {
+          this.firstCard = card;
+          return;
+        }
+      
+        this.lock = true;
+      
+        if (this.firstCard.emoji === card.emoji) {
+          // Match found
+          setTimeout(() => {
+            this.firstCard.match();
+            card.match();
+            this.firstCard = null;
+            this.lock = false;
+      
+            if (this.cards.every(c => c.matched)) {
+              clearInterval(this.interval);
+              const seconds = Math.floor((Date.now() - this.startTime) / 1000);
+              const winMsg = document.getElementById('winMessage');
+              winMsg.textContent = `🎉 Bravo ! Toutes les paires trouvées en ${seconds}s !`;
+              winMsg.style.display = 'block';
+            }
+          }, 300); // Laisse le temps de voir les deux cartes retournées
+        } else {
+          // No match
+          setTimeout(() => {
+            this.firstCard.unflip();
+            card.unflip();
+            this.firstCard = null;
+            this.lock = false;
+          }, 1000); // Donne une seconde pour que le joueur voie les cartes
+        }
+    }
+      
+  }
+  
+  const game = new MemoryGame('gameBoard', 'timer');
+  
