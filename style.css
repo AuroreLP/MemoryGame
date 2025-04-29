@@ -1,7 +1,7 @@
 body {
     font-family: sans-serif;
     text-align: center;
-    background-color: white; /* fond sombre global */
+    background-color: white;
     height: 100vh;
     margin: 0;
     display: flex;
@@ -12,17 +12,10 @@ body {
 
   .timer-restart {
     display: flex;
-    justify-content: center; /* Centre horizontalement */
-    align-items: center;     /* Aligne verticalement */
-    gap: 10px;               /* Espacement entre le texte et le bouton */
-    margin-top: 10px;        /* Un peu d'espace au-dessus */
-  }
-
-  .container {
-    background-color: #2c2c2c;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    gap: 10px;          
+    margin: 10px 0px;  
   }
 
   button {
@@ -32,7 +25,14 @@ body {
     padding: 5px 10px;
     cursor: pointer;
   }
-  
+
+  .container {
+    background-color: #2c2c2c;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  }
+
   .game-board {
     display: grid;
     grid-template-columns: repeat(4, 80px);
