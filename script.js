@@ -44,8 +44,7 @@ class Card {
         
   
     getNode() {
-      return this.element;
-    
+      return this.element; 
   }
 }
   
